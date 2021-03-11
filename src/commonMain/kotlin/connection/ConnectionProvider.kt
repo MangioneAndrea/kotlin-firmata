@@ -1,0 +1,5 @@
+package connection
+
+object ConnectionProvider {
+
+}
