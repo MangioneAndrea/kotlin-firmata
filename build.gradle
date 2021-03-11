@@ -10,6 +10,7 @@ version = '1.0-SNAPSHOT'
 repositories {
     google()
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 kotlin {
@@ -24,7 +25,9 @@ kotlin {
     android()
     sourceSets {
         commonMain {
-
+            dependencies {
+                implementation 'com.github.felHR85:UsbSerial:6.1.0'
+            }
         }
         commonTest {
             dependencies {

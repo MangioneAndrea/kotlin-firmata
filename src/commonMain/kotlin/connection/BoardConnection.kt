@@ -1,4 +1,0 @@
-package connection
-
-class BoardConnection {
-}
