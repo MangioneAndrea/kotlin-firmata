@@ -1,9 +1,5 @@
 package connection
 
-import kotlin.jvm.Volatile
-import kotlin.native.concurrent.ThreadLocal
-
-@ThreadLocal
 object ConnectionProvider {
     private val connections = HashSet<Connection>()
     var activeConnection: Connection? = null

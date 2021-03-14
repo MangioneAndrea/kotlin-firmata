@@ -1,17 +1,18 @@
 package firmata
 
-import board.interfaces.Element
-import connection.ConnectionProvider
+import board.Pin
+import board.interfaces.AbstractPin
+import connection.Connection
 
-class Firmata {
+class Firmata(private val connection: Connection) {
     private val listeners = HashSet<FirmataListener>();
 
     init {
-        ConnectionProvider.activeConnection?.asyncRead(::dispatchMessage)
+        connection.asyncRead(::dispatchMessage)
     }
 
     fun sendRequest(message: Message) {
-        ConnectionProvider.activeConnection?.write(message)
+        connection.write(message)
     }
 
     fun registerListener(firmataListener: FirmataListener): Boolean {
@@ -24,8 +25,20 @@ class Firmata {
         }
     }
 
-    fun attachElement(el: Element) {
+    companion object {
+        private fun adaptedPins(pins: Array<out AbstractPin>, firmata: Firmata): Array<Pin> {
+            return pins.map {
+                Pin(it.position, firmata)
+            }.toTypedArray()
+        }
 
+        fun Firmata.Led(vararg pins: AbstractPin): board.Led {
+            return board.Led(*adaptedPins(pins, this))
+        }
 
+        fun Firmata.HC12(vararg pins: AbstractPin): board.HC12 {
+            return board.HC12(*adaptedPins(pins, this))
+        }
     }
 }
+

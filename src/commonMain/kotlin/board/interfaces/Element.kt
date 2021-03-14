@@ -4,8 +4,8 @@ import board.Pin
 
 interface Element {
     val pins: HashSet<Pin>
-    var MIN_PINS: Int
-    var MAX_PINS: Int
+    val MIN_PINS: Int
+    val MAX_PINS: Int
 
     companion object {
         fun assertPins(caller: Element) {

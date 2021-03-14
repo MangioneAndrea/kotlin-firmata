@@ -2,20 +2,30 @@ package board
 
 import board.interfaces.Actor
 import board.interfaces.Element
+import firmata.Message
 
+@Suppress("unused")
 class Led : Element, Actor {
     override val pins: HashSet<Pin>;
-    override var MIN_PINS = 1;
-    override var MAX_PINS = 1;
+    override val MIN_PINS = 1;
+    override val MAX_PINS = 1;
 
     fun turnOn() {
-        pins.forEach {
-            it.setStatus(Pin.Status.HIGH)
-        }
+        setValue(Pin.Status.HIGH)
+    }
+
+    fun turnOff() {
+        setValue(Pin.Status.LOW)
     }
 
     constructor(vararg pins: Pin) {
         Element.assertPins(this);
         this.pins = pins.toCollection(HashSet())
+    }
+
+    override fun setValue(status: Pin.Status) {
+        pins.forEach {
+            it.status = status
+        }
     }
 }
