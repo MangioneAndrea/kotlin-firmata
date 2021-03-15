@@ -19,8 +19,11 @@ class Led : Element, Actor {
     }
 
     constructor(vararg pins: Pin) {
-        Element.assertPins(this);
         this.pins = pins.toCollection(HashSet())
+        pins.forEach {
+            it.mode = Pin.MODE.OUTPUT
+        }
+        Element.assertPins(this);
     }
 
     override fun setValue(status: Pin.Status) {

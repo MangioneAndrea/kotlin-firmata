@@ -5,11 +5,11 @@ import firmata.Message
 interface Connection {
     fun connect(): Boolean
 
-    fun read(): Message
+    fun read(): ByteArray
 
-    fun asyncRead(callback: (Message) -> Unit)
+    fun asyncRead(callback: (ByteArray) -> Unit)
 
-    fun write(message: Message)
+    fun write(message: ByteArray)
 
     fun close()
 }

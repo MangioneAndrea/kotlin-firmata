@@ -19,7 +19,7 @@ class HC12 : Element, Sensor, Actor {
 
 
     constructor(vararg pins: Pin) {
-        Element.assertPins(this);
         this.pins = pins.toCollection(HashSet())
+        Element.assertPins(this);
     }
 }

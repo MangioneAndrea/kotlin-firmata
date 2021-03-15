@@ -3,7 +3,6 @@ package connection
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbDeviceConnection
 import com.felhr.usbserial.UsbSerialDevice
-import firmata.Message
 import android.hardware.usb.UsbManager
 import com.felhr.usbserial.UsbSerialInterface
 
@@ -27,21 +26,21 @@ class UsbSerialConnection(private val device: UsbDevice, private val usbManager:
         return false;
     }
 
-    override fun read(): Message {
+    override fun read(): ByteArray {
         val byteArray = ByteArray(32)
         usbSerialDevice?.syncRead(byteArray, 2000)
-        return Message(byteArray)
+        return byteArray
 
     }
 
-    override fun asyncRead(callback: (Message) -> Unit) {
+    override fun asyncRead(callback: (ByteArray) -> Unit) {
         usbSerialDevice?.read {
-            callback(Message(it))
+            callback((it))
         }
     }
 
-    override fun write(message: Message) {
-        usbSerialDevice?.write(message.content);
+    override fun write(message: ByteArray) {
+        usbSerialDevice?.write(message);
     }
 
     override fun close() {

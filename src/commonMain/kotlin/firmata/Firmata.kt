@@ -12,33 +12,25 @@ class Firmata(private val connection: Connection) {
     }
 
     fun sendRequest(message: Message) {
-        connection.write(message)
+        connection.write(message.asValidFirmataMessage())
     }
 
     fun registerListener(firmataListener: FirmataListener): Boolean {
         return listeners.add(firmataListener)
     }
 
-    private fun dispatchMessage(message: Message) {
+    private fun dispatchMessage(message: ByteArray) {
         listeners.forEach {
-            it.onMessageReceived(message)
+            it.onMessageReceived(Message(message))
         }
     }
 
     companion object {
-        private fun adaptedPins(pins: Array<out AbstractPin>, firmata: Firmata): Array<Pin> {
-            return pins.map {
-                Pin(it.position, firmata)
-            }.toTypedArray()
+
+        fun Firmata.Led(pin: Int): board.Led {
+            return board.Led(Pin(pin,this))
         }
 
-        fun Firmata.Led(vararg pins: AbstractPin): board.Led {
-            return board.Led(*adaptedPins(pins, this))
-        }
-
-        fun Firmata.HC12(vararg pins: AbstractPin): board.HC12 {
-            return board.HC12(*adaptedPins(pins, this))
-        }
     }
 }
 
