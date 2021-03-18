@@ -26,11 +26,9 @@ class Firmata(private val connection: Connection) {
     }
 
     companion object {
-
         fun Firmata.Led(pin: Int): board.Led {
             return board.Led(Pin(pin,this))
         }
-
     }
 }
 
