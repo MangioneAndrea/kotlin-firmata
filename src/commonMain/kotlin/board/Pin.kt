@@ -10,21 +10,29 @@ class Pin(override var position: Int, private val firmata: Firmata) : AbstractPi
     var mode: MODE = MODE.UNSET
         set(v) {
             field = v
-            firmata.sendRequest(Message(Constants.MIDI_SET_PIN_MODE, this, v.hex))
+            firmata.sendRequest(byteArrayOf(Constants.MIDI_SET_PIN_MODE, this.position.toByte(), v.hex))
         }
 
     var status: Status = Status.LOW
         set(value) {
+            field = value
             when (mode) {
-                MODE.INPUT -> firmata.sendRequest(Message(Constants.MIDI_SET_DIGITAL_PIN_VALUE, this, value.digital));
-                MODE.OUTPUT -> firmata.sendRequest(Message(Constants.MIDI_SET_DIGITAL_PIN_VALUE, this, value.digital));
-                MODE.ANALOG -> firmata.sendRequest(Message(Constants.MIDI_ANALOG_MESSAGE, this, value.analog));
-                MODE.PWM -> return;
-                MODE.SERVO -> return;
+                MODE.INPUT, MODE.OUTPUT -> firmata.sendRequest(
+                    Message(
+                        Constants.MIDI_SET_DIGITAL_PIN_VALUE,
+                        this,
+                        value.digital
+                    )
+                );
+                MODE.ANALOG, MODE.PWM, MODE.SERVO -> firmata.sendRequest(
+                    Message(
+                        Constants.MIDI_ANALOG_MESSAGE,
+                        this,
+                        value.analog
+                    )
+                );
                 MODE.UNSET -> return;
             }
-            firmata.sendRequest(Message(Constants.MIDI_SET_DIGITAL_PIN_VALUE, this, value.digital))
-            field = value
         }
 
     class Status(private var value: Int) {
