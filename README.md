@@ -32,10 +32,26 @@ led.setBrightness(Math.random().toFloat())
 #### Example Servo
 
 ```kotlin
-// Create a new led component on pin 11 (on arduino uno it's a PWM)
+// Create a new servo component on pin 6 (on arduino uno it's a PWM)
 val servo = firmata.Servo(6)
 // Tell the servo to go into a position between 0 and 1. See kotlin docs for further usage
 servo.to(0.7F)
+```
+
+#### Example Motor with RadioGroup
+
+```kotlin
+// Create a new motor component with pins 2 and 3
+val motor = firmata.Motor(2, 3)
+// Set on radio group change
+(root.findViewById(R.id.radioGroup) as RadioGroup).setOnCheckedChangeListener { radioGroup, _ ->
+   // Just a when do! :D
+    when (radioGroup.checkedRadioButtonId) {
+        R.id.backwards -> motor.turnBackward()
+        R.id.forwards -> motor.turnForward()
+        R.id.stop -> motor.stop()
+    }
+}
 ```
 
 # Support me
