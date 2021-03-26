@@ -1,6 +1,5 @@
 package connection
 
-import firmata.Message
 
 interface Connection {
     fun connect(): Boolean
@@ -12,4 +11,8 @@ interface Connection {
     fun write(message: ByteArray)
 
     fun close()
+
+    fun isConnected(): Boolean
+
+    fun waitUntilConnected()
 }
