@@ -40,6 +40,14 @@ class Firmata(private val connection: Connection) {
         fun Firmata.Servo(pin: Int): board.Servo {
             return board.Servo(Pin(pin, this))
         }
+
+        fun Firmata.Motor(pin1: Int, pin2: Int): board.Motor {
+            return board.Motor(Pin(pin1, this), Pin(pin2, this))
+        }
+
+        fun Firmata.PWMMotor(pin1: Int, pin2: Int): board.Motor {
+            return board.Motor(Pin(pin1, this), Pin(pin2, this), Pin.MODE.PWM)
+        }
     }
 }
 

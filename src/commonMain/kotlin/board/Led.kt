@@ -5,15 +5,11 @@ import board.interfaces.Element
 
 @Suppress("unused")
 class Led(pin: Pin, mode: Pin.MODE = Pin.MODE.OUTPUT) : Element, Actor {
-    override val pins: HashSet<Pin> = hashSetOf(pin);
-    override val MIN_PINS = 1;
-    override val MAX_PINS = 1;
+
+    override val pins = arrayListOf(pin)
 
     init {
-        pins.forEach {
-            it.mode = mode
-        }
-        Element.assertPins(this);
+        pins[0].mode = mode
     }
 
     fun turnOn() {
@@ -29,9 +25,7 @@ class Led(pin: Pin, mode: Pin.MODE = Pin.MODE.OUTPUT) : Element, Actor {
     }
 
 
-    override fun setValue(status: Pin.Status) {
-        pins.forEach {
-            it.status = status
-        }
+    override fun setValue(vararg status: Pin.Status) {
+        pins[0].status = status[0]
     }
 }

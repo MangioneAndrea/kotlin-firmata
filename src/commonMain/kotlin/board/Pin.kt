@@ -35,7 +35,7 @@ class Pin(override var position: Int, private val firmata: Firmata) : AbstractPi
             }
         }
 
-    class Status(private var value: Int) {
+    class Status(var value: Int) {
         /**
          * digital pin 7 bitmask
          */

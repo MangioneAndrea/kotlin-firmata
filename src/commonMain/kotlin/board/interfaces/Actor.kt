@@ -3,6 +3,6 @@ package board.interfaces
 import board.Pin
 
 interface Actor {
-    fun setValue(status: Pin.Status)
+    fun setValue(vararg status: Pin.Status)
 }
 

@@ -5,11 +5,10 @@ import board.interfaces.Element
 import board.interfaces.Sensor
 
 class HC12 : Element, Sensor, Actor {
-    override val pins: HashSet<Pin>
-    override val MIN_PINS = 2;
-    override val MAX_PINS = 3;
+    override val pins: ArrayList<Pin>
+        get() = TODO("Not yet implemented")
 
-    override fun setValue(status: Pin.Status) {
+    override fun setValue(vararg status: Pin.Status) {
         TODO("Not yet implemented")
     }
 
@@ -18,8 +17,4 @@ class HC12 : Element, Sensor, Actor {
     }
 
 
-    constructor(vararg pins: Pin) {
-        this.pins = pins.toCollection(HashSet())
-        Element.assertPins(this);
-    }
 }
