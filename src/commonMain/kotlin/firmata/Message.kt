@@ -39,17 +39,23 @@ class DigitalMessage(pin: Pin, content: Byte) : Message(
  * 0  toggle analogIn reporting (0xC0-0xCF) (MIDI Program Change)
  * 1  disable(0)/enable(non-zero)
  */
-class AnalogReportMessage(pin: Pin, enable: Boolean) : Message(
+open class AnalogReportMessage(pin: Pin, enable: Boolean) : Message(
     (Constants.MIDI_REPORT_ANALOG.toInt() or (pin.position and 0x0F)).toByte(), if (enable) 1 else 0
 )
+
+class AnalogReportMessageEnable(pin: Pin) : AnalogReportMessage(pin, true)
+class AnalogReportMessageDisable(pin: Pin) : AnalogReportMessage(pin, false)
 
 /** toggle digital port reporting by port (second nibble of byte 0), e.g. 0xD1 is port 1 is pins 8 to 15,
  * 0  toggle digital port reporting (0xD0-0xDF) (MIDI Aftertouch)
  * 1  disable(0)/enable(non-zero)
  */
-class DigitalReportMessage(pin: Pin, enable: Boolean) : Message(
+open class DigitalReportMessage(pin: Pin, enable: Boolean) : Message(
     Constants.MIDI_REPORT_DIGITAL, (pin.position and 0x7F).toByte(), if (enable) 1 else 0
 )
+
+class DigitalReportMessageEnable(pin: Pin) : DigitalReportMessage(pin, true)
+class DigitalReportMessageDisable(pin: Pin) : DigitalReportMessage(pin, false)
 
 /** set pin mode
  * 1  set digital pin mode (0xF4) (MIDI Undefined)

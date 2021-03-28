@@ -32,21 +32,27 @@ class Pin(override var position: Int, private val firmata: Firmata) : AbstractPi
         }
         get() {
             when (mode) {
-                MODE.INPUT, MODE.OUTPUT -> firmata.sendRequest(
-                    DigitalReportMessage(
-                        this,
-                        true
+                MODE.INPUT, MODE.OUTPUT -> {
+                    firmata.sendRequest(
+                        DigitalReportMessageEnable(this)
                     )
-                );
-                MODE.ANALOG, MODE.PWM, MODE.SERVO -> firmata.sendRequest(
-                    AnalogReportMessage(
-                        this,
-                        true
+                    firmata.readValue()
+                    firmata.sendRequest(
+                        DigitalReportMessageDisable(this)
                     )
-                );
+                }
+                MODE.ANALOG, MODE.PWM, MODE.SERVO -> {
+                    firmata.sendRequest(
+                        AnalogReportMessageEnable(this)
+                    );
+                    firmata.readValue()
+                    firmata.sendRequest(
+                        AnalogReportMessageDisable(this)
+                    );
+                }
                 MODE.UNSET -> return Status(0);
             }
-            firmata.readValue()
+
             return Status(0)
         }
 
