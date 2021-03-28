@@ -11,11 +11,11 @@ class Firmata(private val connection: Connection) {
     }
 
     fun sendRequest(message: Message) {
-        connection.write(message.asValidFirmataMessage())
+        connection.write(message.content)
     }
 
-    fun sendRequest(message: ByteArray) {
-        connection.write(message)
+    fun readValue(): ByteArray {
+        return connection.read()
     }
 
     fun registerListener(firmataListener: FirmataListener): Boolean {
@@ -24,7 +24,7 @@ class Firmata(private val connection: Connection) {
 
     private fun dispatchMessage(message: ByteArray) {
         listeners.forEach {
-            it.onMessageReceived(Message(message))
+            it.onMessageReceived(Message(*message))
         }
     }
 
@@ -47,6 +47,10 @@ class Firmata(private val connection: Connection) {
 
         fun Firmata.PWMMotor(pin1: Int, pin2: Int): board.Motor {
             return board.Motor(Pin(pin1, this), Pin(pin2, this), Pin.MODE.PWM)
+        }
+
+        fun Firmata.Photoresistor(pin: Int): board.Photoresistor {
+            return board.Photoresistor(Pin(pin, this))
         }
     }
 }

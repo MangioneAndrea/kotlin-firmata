@@ -1,16 +1,14 @@
 package board
 
 import board.interfaces.AbstractPin
-import firmata.Constants
-import firmata.Firmata
-import firmata.Message
+import firmata.*
 
 @Suppress("unused")
 class Pin(override var position: Int, private val firmata: Firmata) : AbstractPin(position) {
     var mode: MODE = MODE.UNSET
-        set(v) {
-            field = v
-            firmata.sendRequest(byteArrayOf(Constants.MIDI_SET_PIN_MODE, this.position.toByte(), v.hex))
+        set(mode) {
+            field = mode
+            firmata.sendRequest(PinModeMessage(this, mode))
         }
 
     var status: Status = Status.LOW
@@ -18,21 +16,38 @@ class Pin(override var position: Int, private val firmata: Firmata) : AbstractPi
             field = value
             when (mode) {
                 MODE.INPUT, MODE.OUTPUT -> firmata.sendRequest(
-                    Message(
-                        Constants.MIDI_SET_DIGITAL_PIN_VALUE,
+                    DigitalMessage(
                         this,
                         value.digital
                     )
                 );
                 MODE.ANALOG, MODE.PWM, MODE.SERVO -> firmata.sendRequest(
-                    Message(
-                        Constants.MIDI_ANALOG_MESSAGE,
+                    AnalogMessage(
                         this,
-                        value.analog
+                        *value.analog
                     )
                 );
                 MODE.UNSET -> return;
             }
+        }
+        get() {
+            when (mode) {
+                MODE.INPUT, MODE.OUTPUT -> firmata.sendRequest(
+                    DigitalReportMessage(
+                        this,
+                        true
+                    )
+                );
+                MODE.ANALOG, MODE.PWM, MODE.SERVO -> firmata.sendRequest(
+                    AnalogReportMessage(
+                        this,
+                        true
+                    )
+                );
+                MODE.UNSET -> return Status(0);
+            }
+            firmata.readValue()
+            return Status(0)
         }
 
     class Status(var value: Int) {
