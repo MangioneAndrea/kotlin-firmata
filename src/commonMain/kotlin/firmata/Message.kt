@@ -51,6 +51,28 @@ class DigitalReportMessage(pin: Pin, enable: Boolean) : Message(
     Constants.MIDI_REPORT_DIGITAL, (pin.position and 0x7F).toByte(), if (enable) 1 else 0
 )
 
+/** set pin mode
+ * 1  set digital pin mode (0xF4) (MIDI Undefined)
+ * 2  pin number (0-127)
+ * 3  state (INPUT/OUTPUT/ANALOG/PWM/SERVO, 0/1/2/3/4)
+ */
 class PinModeMessage(pin: Pin, mode: Pin.MODE) : Message(
     Constants.MIDI_SET_PIN_MODE, pin.position.toByte(), mode.hex
 )
+
+/** request version report
+ * 0  request version report (0xF9) (MIDI Undefined)
+ */
+class VersionRequestMessage : Message(
+    Constants.MIDI_REPORT_VERSION
+)
+
+/** version report format
+ * -------------------------------------------------
+ * 0  version report header (0xF9) (MIDI Undefined)
+ * 1  major version (0-127)
+ * 2  minor version (0-127)
+ */
+class VersionReportMessage {
+    // TODO: Not implemented yet
+}

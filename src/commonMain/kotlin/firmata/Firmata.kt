@@ -28,6 +28,7 @@ class Firmata(private val connection: Connection) {
         }
     }
 
+    @Suppress("unused")
     companion object {
         fun Firmata.Led(pin: Int): board.Led {
             return board.Led(Pin(pin, this), Pin.MODE.OUTPUT)
