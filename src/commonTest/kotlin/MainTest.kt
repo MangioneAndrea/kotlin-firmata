@@ -20,7 +20,7 @@ class MainTest {
         firmata.Led(4).turnOn()
         assertEquals(
             byteArrayToString(Constants.MIDI_DIGITAL_MESSAGE.get(), 4, 1),
-            lastMessage+"hi"
+            lastMessage
         )
     }
 
