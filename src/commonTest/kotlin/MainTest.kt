@@ -1,3 +1,4 @@
+import Util.arduinoUnoCapabilities
 import firmata.Constants
 import firmata.Firmata
 import firmata.Firmata.Companion.Led
@@ -14,16 +15,20 @@ class MainTest {
 
     @Test
     fun TurnLedOn() {
-        Firmata(connection).Led(4).turnOn()
+        val firmata = Firmata(connection)
+        connection.feedData(arduinoUnoCapabilities)
+        firmata.Led(4).turnOn()
         assertEquals(
             byteArrayToString(Constants.MIDI_DIGITAL_MESSAGE.get(), 4, 1),
-            lastMessage
+            lastMessage+"hi"
         )
     }
 
     @Test
     fun TurnLedOff() {
-        Firmata(connection).Led(4).turnOff()
+        val firmata = Firmata(connection)
+        connection.feedData(arduinoUnoCapabilities)
+        firmata.Led(4).turnOff()
         assertEquals(
             byteArrayToString(Constants.MIDI_DIGITAL_MESSAGE.get(), 4, 0),
             lastMessage
