@@ -9,5 +9,7 @@ jobs:
         with:
           java-version: 11
           distribution: adopt
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
       - name: build gradle
         run: ./gradlew build
