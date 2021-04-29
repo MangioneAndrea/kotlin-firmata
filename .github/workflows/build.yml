@@ -11,5 +11,6 @@ jobs:
           distribution: adopt
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-      - name: build gradle
-        run: ./gradlew build
+      - uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: build
