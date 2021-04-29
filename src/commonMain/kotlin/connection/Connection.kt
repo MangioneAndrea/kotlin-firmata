@@ -4,9 +4,7 @@ package connection
 interface Connection {
     fun connect(): Boolean
 
-    fun read(): ByteArray
-
-    fun asyncRead(callback: (ByteArray) -> Unit)
+    fun setupReadListener(callback: (data: ByteArray) -> Unit);
 
     fun write(message: ByteArray)
 
@@ -15,4 +13,5 @@ interface Connection {
     fun isConnected(): Boolean
 
     fun waitUntilConnected()
+
 }

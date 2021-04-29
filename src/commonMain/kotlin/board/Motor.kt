@@ -3,14 +3,9 @@ package board
 import board.interfaces.Actor
 import board.interfaces.Element
 
-class Motor(pinA: Pin, pinB: Pin, mode: Pin.MODE = Pin.MODE.OUTPUT) : Element, Actor {
+class Motor(pinA: Pin, pinB: Pin) : Element, Actor {
     override val pins = arrayListOf(pinA, pinB)
 
-    init {
-        pins.forEach {
-            it.mode = mode
-        }
-    }
 
     fun turnForward() {
         setValue(Pin.Status.HIGH, Pin.Status.LOW)

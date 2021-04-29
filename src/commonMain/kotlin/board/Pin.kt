@@ -1,15 +1,21 @@
 package board
 
-import board.interfaces.AbstractPin
+import exceptions.PinModeNotAvailableException
 import firmata.*
 
 @Suppress("unused")
-class Pin(override var position: Int, private val firmata: Firmata) : AbstractPin(position) {
+class Pin(var position: Int, private val firmata: Firmata, val modes: HashSet<MODE>) {
     var mode: MODE = MODE.UNSET
         set(mode) {
+            if (!modes.contains(mode)) throw PinModeNotAvailableException(this, mode);
             field = mode
             firmata.sendRequest(PinModeMessage(this, mode))
         }
+    /*
+    constructor(position: Int, firmata: Firmata, mode: MODE) : this(position, firmata) {
+        this.mode = mode;
+    }
+    */
 
     var status: Status = Status.LOW
         set(value) {
@@ -29,31 +35,6 @@ class Pin(override var position: Int, private val firmata: Firmata) : AbstractPi
                 );
                 MODE.UNSET -> return;
             }
-        }
-        get() {
-            when (mode) {
-                MODE.INPUT, MODE.OUTPUT -> {
-                    firmata.sendRequest(
-                        DigitalReportMessageEnable(this)
-                    )
-                    firmata.readValue()
-                    firmata.sendRequest(
-                        DigitalReportMessageDisable(this)
-                    )
-                }
-                MODE.ANALOG, MODE.PWM, MODE.SERVO -> {
-                    firmata.sendRequest(
-                        AnalogReportMessageEnable(this)
-                    );
-                    firmata.readValue()
-                    firmata.sendRequest(
-                        AnalogReportMessageDisable(this)
-                    );
-                }
-                MODE.UNSET -> return Status(0);
-            }
-
-            return Status(0)
         }
 
     class Status(var value: Int) {
@@ -83,7 +64,37 @@ class Pin(override var position: Int, private val firmata: Firmata) : AbstractPi
     }
 
     enum class MODE(val hex: Byte) {
-        INPUT(0), OUTPUT(1), ANALOG(2), PWM(3), SERVO(4), UNSET(-1),
+        INPUT(0x00),
+        OUTPUT(0x01),
+        ANALOG(0x02),
+        PWM(0x03),
+        SERVO(0x04),
+        SHIFT(0x05),
+        I2C(0x06),
+        ONEWIRE(0x07),
+        STEPPER(0x08),
+        ENCODER(0x09),
+        SERIAL(0x0a),
+        INPUT_PULLUP(0x0B),
+        UNSET(-1);
+
+        companion object {
+            fun from(hex: Byte): MODE {
+                return values().find { it.hex == hex } ?: UNSET
+            }
+        }
     }
 
+
+    override fun hashCode(): Int {
+        return position
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as Pin
+        if (position == other.position) return true
+        return false
+    }
 }

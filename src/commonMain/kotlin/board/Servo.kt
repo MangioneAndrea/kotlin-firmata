@@ -10,10 +10,6 @@ class Servo(pin: Pin) : Element, Actor {
     private val min = Pin.Status(1);
 
 
-    init {
-        pins[0].mode = Pin.MODE.SERVO
-    }
-
     fun toMax() {
         setValue(max)
     }

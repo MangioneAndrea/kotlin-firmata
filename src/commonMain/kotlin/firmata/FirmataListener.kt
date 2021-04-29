@@ -1,5 +1,7 @@
 package firmata
 
-interface FirmataListener {
+import board.interfaces.Element
+
+interface FirmataListener : Element {
     fun onMessageReceived(message: Message);
 }

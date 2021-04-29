@@ -4,16 +4,17 @@ import board.interfaces.Element
 import board.interfaces.Sensor
 import firmata.Message
 
-class Photoresistor(pin: Pin) : Element, Sensor {
+class Button(pin: Pin) : Element, Sensor {
     override val pins: ArrayList<Pin> = arrayListOf(pin)
+    private var status: Pin.Status = Pin.Status(0);
 
 
     override fun getValue(): Pin.Status {
-        return pins[0].status
+        return status
     }
 
     override fun onMessageReceived(message: Message) {
-        TODO("Not yet implemented")
+        message.print()
     }
 
 }

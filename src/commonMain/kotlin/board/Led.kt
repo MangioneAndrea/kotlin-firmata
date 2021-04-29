@@ -4,13 +4,10 @@ import board.interfaces.Actor
 import board.interfaces.Element
 
 @Suppress("unused")
-class Led(pin: Pin, mode: Pin.MODE = Pin.MODE.OUTPUT) : Element, Actor {
+class Led(pin: Pin) : Element, Actor {
 
     override val pins = arrayListOf(pin)
 
-    init {
-        pins[0].mode = mode
-    }
 
     fun turnOn() {
         setValue(Pin.Status.HIGH)
