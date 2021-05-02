@@ -2,7 +2,7 @@ package board
 
 import board.interfaces.Element
 import board.interfaces.Sensor
-import firmata.Message
+import message.Message
 
 class Photoresistor(pin: Pin) : Element, Sensor {
     override val pins: ArrayList<Pin> = arrayListOf(pin)

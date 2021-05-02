@@ -1,7 +1,8 @@
 import Util.arduinoUnoCapabilities
-import firmata.Constants
+import message.Sysex
 import firmata.Firmata
 import firmata.Firmata.Companion.Led
+import message.Midi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,7 +20,7 @@ class MainTest {
         connection.feedData(arduinoUnoCapabilities)
         firmata.Led(4).turnOn()
         assertEquals(
-            byteArrayToString(Constants.MIDI_DIGITAL_MESSAGE.get(), 4, 1),
+            byteArrayToString(Midi.DIGITAL_MESSAGE.get(), 4, 1),
             lastMessage
         )
     }
@@ -30,7 +31,7 @@ class MainTest {
         connection.feedData(arduinoUnoCapabilities)
         firmata.Led(4).turnOff()
         assertEquals(
-            byteArrayToString(Constants.MIDI_DIGITAL_MESSAGE.get(), 4, 0),
+            byteArrayToString(Midi.DIGITAL_MESSAGE.get(), 4, 0),
             lastMessage
         )
     }

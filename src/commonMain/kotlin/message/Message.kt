@@ -1,12 +1,20 @@
-package firmata
+package message
 
 import board.Pin
 import kotlin.experimental.and
 import kotlin.experimental.or
 
 open class Message(vararg var content: Byte) {
-    val lastIndex: Int
+    private val lastIndex: Int
         get() = content.size - 1
+
+    val firstNibble get(): Byte = firstByte and 0xF0.toByte()
+
+    val secondNibble get(): Byte = firstByte and 0x0F.toByte()
+
+    val sysexContent get(): Message = partial(1 until lastIndex - 1)
+
+    val firstByte get(): Byte = content.first()
 
     operator fun get(index: Int): Byte = content[index]
 
@@ -18,17 +26,10 @@ open class Message(vararg var content: Byte) {
 
     infix fun endingAt(to: Int): Message = partial(0..to)
 
-    fun isSysex(): Boolean = firstByte() == Constants.MIDI_START_SYSEX.get()
+    fun isSysex(): Boolean = Midi.START_SYSEX correspondsTo firstByte
 
-    fun firstNibble(): Byte = firstByte() and 0xF0.toByte()
 
-    fun secondNibble(): Byte = firstByte() and 0x0F.toByte()
-
-    fun getSysexContent(): Message = partial(1 until lastIndex - 1)
-
-    fun firstByte(): Byte = content.first()
-
-    fun print() = println("Message: ${toHex()}")
+    fun print() = println("Message: ${asHexString()}")
 
 
     fun splitAll(byte: Byte): Array<Message> {
@@ -45,7 +46,7 @@ open class Message(vararg var content: Byte) {
         return list.toTypedArray()
     }
 
-    fun toHex(): String {
+    fun asHexString(): String {
         val hexArray = charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
         var res = "";
         for (j in content.indices) {
@@ -76,7 +77,7 @@ open class Message(vararg var content: Byte) {
  * 2  analog most significant 7 bits
  */
 class AnalogMessage(pin: Pin, vararg content: Byte) : Message(
-    (Constants.MIDI_ANALOG_MESSAGE.toInt() or (pin.position and 0x0F)).toByte(), *content
+    (Midi.ANALOG_MESSAGE.toInt() or (pin.position and 0x0F)).toByte(), *content
 )
 
 /** two byte digital data format, second nibble of byte 0 gives the port number (e.g. 0x92 is the third port, port 2)
@@ -85,7 +86,7 @@ class AnalogMessage(pin: Pin, vararg content: Byte) : Message(
  * 2  digital pin 7 bitmask
  */
 class DigitalMessage(pin: Pin, content: Byte) : Message(
-    Constants.MIDI_DIGITAL_MESSAGE.get(), (pin.position and 0x7F).toByte(), content
+    Midi.DIGITAL_MESSAGE.get(), (pin.position and 0x7F).toByte(), content
 )
 
 
@@ -94,7 +95,7 @@ class DigitalMessage(pin: Pin, content: Byte) : Message(
  * 1  disable(0)/enable(non-zero)
  */
 open class AnalogReportMessage(pin: Pin, enable: Boolean) : Message(
-    (Constants.MIDI_REPORT_ANALOG.toInt() or (pin.position)).toByte(), if (enable) 1 else 0
+    (Midi.REPORT_ANALOG.toInt() or (pin.position)).toByte(), if (enable) 1 else 0
 )
 
 class AnalogReportMessageEnable(pin: Pin) : AnalogReportMessage(pin, true)
@@ -105,7 +106,7 @@ class AnalogReportMessageDisable(pin: Pin) : AnalogReportMessage(pin, false)
  * 1  disable(0)/enable(non-zero)
  */
 open class DigitalReportMessage(set: Int, enable: Boolean) : Message(
-    Constants.MIDI_REPORT_DIGITAL.get() or (set.toByte() and 0x0F), if (enable) 1 else 0
+    Midi.REPORT_DIGITAL.get() or (set.toByte() and 0x0F), if (enable) 1 else 0
 )
 
 class DigitalReportMessageEnable(set: Int) : DigitalReportMessage(set, true)
@@ -117,14 +118,14 @@ class DigitalReportMessageDisable(set: Int) : DigitalReportMessage(set, false)
  * 3  state (INPUT/OUTPUT/ANALOG/PWM/SERVO, 0/1/2/3/4)
  */
 class PinModeMessage(pin: Pin, mode: Pin.MODE) : Message(
-    Constants.MIDI_SET_PIN_MODE.get(), pin.position.toByte(), mode.hex
+    Midi.SET_PIN_MODE.get(), pin.position.toByte(), mode.hex
 )
 
 /** request version report
  * 0  request version report (0xF9) (MIDI Undefined)
  */
 class VersionRequestMessage : Message(
-    Constants.MIDI_REPORT_VERSION.get()
+    Midi.REPORT_VERSION.get()
 )
 
 /** firmware name and version
@@ -156,7 +157,7 @@ class FirmwareNameAndVersionMessage {
  * 2  END_SYSEX                (0xF7)
  */
 class CapabilityQueryMessage : Message(
-    Constants.MIDI_START_SYSEX.get(),
-    Constants.SYSEX_CAPABILITY_QUERY.get(),
-    Constants.MIDI_END_SYSEX.get()
+    Midi.START_SYSEX.get(),
+    Sysex.CAPABILITY_QUERY.get(),
+    Midi.END_SYSEX.get()
 )

@@ -1,27 +1,26 @@
 package board
 
+import exceptions.ActionNotSupportedWithCurrentModeException
 import exceptions.PinModeNotAvailableException
 import firmata.*
+import message.AnalogMessage
+import message.DigitalMessage
+import message.PinModeMessage
 
 @Suppress("unused")
 class Pin(var position: Int, private val firmata: Firmata, val modes: HashSet<MODE>) {
-    var mode: MODE = MODE.UNSET
+    var mode: MODE = MODE.OUTPUT
         set(mode) {
             if (!modes.contains(mode)) throw PinModeNotAvailableException(this, mode);
             field = mode
             firmata.sendRequest(PinModeMessage(this, mode))
         }
-    /*
-    constructor(position: Int, firmata: Firmata, mode: MODE) : this(position, firmata) {
-        this.mode = mode;
-    }
-    */
 
     var status: Status = Status.LOW
         set(value) {
             field = value
             when (mode) {
-                MODE.INPUT, MODE.OUTPUT -> firmata.sendRequest(
+                MODE.INPUT, MODE.OUTPUT, MODE.INPUT_PULLUP -> firmata.sendRequest(
                     DigitalMessage(
                         this,
                         value.digital
@@ -33,7 +32,7 @@ class Pin(var position: Int, private val firmata: Firmata, val modes: HashSet<MO
                         *value.analog
                     )
                 );
-                MODE.UNSET -> return;
+                else -> throw ActionNotSupportedWithCurrentModeException(this, mode, "setting the value");
             }
         }
 
@@ -75,12 +74,11 @@ class Pin(var position: Int, private val firmata: Firmata, val modes: HashSet<MO
         STEPPER(0x08),
         ENCODER(0x09),
         SERIAL(0x0a),
-        INPUT_PULLUP(0x0B),
-        UNSET(-1);
+        INPUT_PULLUP(0x0B);
 
         companion object {
             fun from(hex: Byte): MODE {
-                return values().find { it.hex == hex } ?: UNSET
+                return values().find { it.hex == hex } ?: OUTPUT
             }
         }
     }

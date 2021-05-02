@@ -1,9 +1,9 @@
 import Util.arduinoUnoCapabilities
 import exceptions.PinModeNotAvailableException
 import exceptions.PinNotOnBoardException
-import firmata.CapabilityQueryMessage
 import firmata.Firmata
 import firmata.Firmata.Companion.Led
+import message.CapabilityQueryMessage
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -39,6 +39,7 @@ class FirmataTest {
     @Test
     fun BoardCapabilityRestrictPinUsage() {
         val firmata = Firmata(connection);
+
         connection.feedData(arduinoUnoCapabilities)
         assertFailsWith(PinNotOnBoardException::class) { firmata.Led(20) }
     }

@@ -4,8 +4,7 @@ import board.Pin
 import board.boards.Board
 import connection.Connection
 import exceptions.PinNotOnBoardException
-import firmata.Constants.*
-import java.lang.NullPointerException
+import message.*
 
 class Firmata(private val connection: Connection) {
     private val listeners = HashSet<FirmataListener>();
@@ -14,6 +13,7 @@ class Firmata(private val connection: Connection) {
 
     init {
         connection.run {
+            connect()
             waitUntilConnected()
             setupReadListener(messageBuffer::addBytes)
             sendRequest(CapabilityQueryMessage());
@@ -43,18 +43,18 @@ class Firmata(private val connection: Connection) {
 
     //https://github.com/firmata/protocol/blob/master/protocol.md#message-types
     private fun deliverMessage(message: Message) {
-        println("message delivered: ${message.toHex()}")
+        println("message delivered: ${message.asHexString()}")
         if (message.isSysex()) {
-            val sysexMessage = message.getSysexContent()
-            if (message[1] == SYSEX_CAPABILITY_RESPONSE.get()) {
+            val sysexMessage = message.sysexContent
+            if (Sysex.CAPABILITY_RESPONSE correspondsTo message[1]) {
                 updateCapability(sysexMessage startingAt 1)
             }
         } else {
-            when (message.firstNibble()) {
+            when (message.firstNibble) {
                 0xE0.toByte(), 0xC0.toByte() -> {
                     // Analog | Second bit = pin
                     listeners.forEach {
-                        if (it.pins.any { pin -> pin.position.toByte() == message.secondNibble() }) it.onMessageReceived(
+                        if (it.pins.any { pin -> pin.position.toByte() == message.secondNibble }) it.onMessageReceived(
                             message
                         )
                     }
@@ -64,7 +64,7 @@ class Firmata(private val connection: Connection) {
                 }
                 0xF0.toByte() -> {
                     // Set | Second byte = pin / system reset
-                    if (message.firstByte() == MIDI_SYSTEM_RESET.get()) {
+                    if (Midi.SYSTEM_RESET correspondsTo message.firstByte) {
                         // System reset
                     } else {
                         listeners.forEach {
