@@ -8,7 +8,7 @@ import message.DigitalMessage
 import message.PinModeMessage
 
 @Suppress("unused")
-class Pin(var position: Int, private val firmata: Firmata, val modes: HashSet<MODE>) {
+class Pin(var position: Int, val firmata: Firmata, val modes: HashSet<MODE>) {
     var mode: MODE = MODE.OUTPUT
         set(mode) {
             if (!modes.contains(mode)) throw PinModeNotAvailableException(this, mode);

@@ -2,8 +2,14 @@ package board
 
 import board.interfaces.Actor
 import board.interfaces.Element
+import message.Message
+import message.Midi
+import message.Sysex
 
 @Suppress("unused")
+/**
+ * @see 'https://github.com/firmata/protocol/blob/master/servos.md'
+ */
 class Servo(pin: Pin) : Element, Actor {
     override val pins = arrayListOf(pin)
     private val max = Pin.Status(180);
@@ -36,5 +42,19 @@ class Servo(pin: Pin) : Element, Actor {
 
     override fun setValue(vararg status: Pin.Status) {
         pins[0].status = status[0]
+    }
+
+    fun config(pulseLSB: IntRange, pulseMSB: IntRange) {
+        pins[0].firmata.sendRequest(
+            Message(
+                Midi.END_SYSEX.get(),
+                Sysex.SERVO_CONFIG.get(),
+                pulseLSB.first.toByte(),
+                pulseMSB.first.toByte(),
+                pulseLSB.last.toByte(),
+                pulseMSB.last.toByte(),
+                Midi.END_SYSEX.get(),
+            )
+        )
     }
 }
