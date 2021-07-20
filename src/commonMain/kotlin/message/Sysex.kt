@@ -4,7 +4,8 @@ package message
  * Sysex Commands (128-255 / 0x80-0xFF)
  * @see <a href="http://firmata.org/wiki/Protocol">Firmata protocol</a> to get the full list of messages
  */
-enum class Sysex(val byte: Byte) {
+@Suppress("unused")
+enum class Sysex(private val byte: Byte) {
     SERIAL_DATA(0x60),
     ENCODER_DATA(0x61),
     ANALOG_MAPPING_QUERY(0x69),
@@ -32,8 +33,10 @@ enum class Sysex(val byte: Byte) {
         return byte.toInt()
     }
 
-    infix fun correspondsTo(other: Any): Boolean {
-        return toInt() == other || get() == other;
+    infix fun correspondsTo(other: Any?): Boolean {
+        if (other == null) return false
+        if (this === other) return true
+        return toInt() == other || get() == other
     }
 
     fun get(): Byte {

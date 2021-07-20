@@ -1,5 +1,4 @@
 import Util.arduinoUnoCapabilities
-import message.Sysex
 import firmata.Firmata
 import firmata.Firmata.Companion.Led
 import message.Midi

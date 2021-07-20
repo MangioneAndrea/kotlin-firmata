@@ -1,11 +1,10 @@
 package message
 
-class MessageBuffer(val callback: (message: Message)->Unit) {
+class MessageBuffer(val callback: (message: Message) -> Unit) {
 
     private val receivedData = ArrayList<Byte>()
     private var openBuffer = ArrayList<Byte>()
     private var missing = 0;
-
 
 
     fun addBytes(vararg bytes: Byte) {

@@ -2,7 +2,7 @@ package board
 
 import exceptions.ActionNotSupportedWithCurrentModeException
 import exceptions.PinModeNotAvailableException
-import firmata.*
+import firmata.Firmata
 import message.AnalogMessage
 import message.DigitalMessage
 import message.PinModeMessage

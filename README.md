@@ -45,7 +45,7 @@ servo.to(0.7F)
 val motor = firmata.Motor(2, 3)
 // Set on radio group change
 (root.findViewById(R.id.radioGroup) as RadioGroup).setOnCheckedChangeListener { radioGroup, _ ->
-   // Just a when do! :D
+    // Just a when do! :D
     when (radioGroup.checkedRadioButtonId) {
         R.id.backwards -> motor.turnBackward()
         R.id.forwards -> motor.turnForward()

@@ -4,7 +4,7 @@ package message
  * Midi Commands (128-255 / 0x80-0xFF)
  * @see <a href="http://firmata.org/wiki/Protocol">Firmata protocol</a> to get the full list of messages
  */
-enum class Midi(val byte: Byte) {
+enum class Midi(private val byte: Byte) {
     DIGITAL_MESSAGE(0x90.toByte()),
     ANALOG_MESSAGE(0xE0.toByte()),
     REPORT_ANALOG(0xC0.toByte()),
@@ -20,8 +20,10 @@ enum class Midi(val byte: Byte) {
         return byte.toInt()
     }
 
-    infix fun correspondsTo(other: Any): Boolean {
-        return toInt() == other || get() == other;
+    infix fun correspondsTo(other: Any?): Boolean {
+        if (other == null) return false
+        if (this === other) return true
+        return toInt() == other || get() == other
     }
 
     fun get(): Byte {
