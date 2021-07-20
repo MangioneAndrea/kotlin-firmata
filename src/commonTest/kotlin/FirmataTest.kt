@@ -33,7 +33,7 @@ class FirmataTest {
         val firmata = Firmata(connection);
         connection.feedData(arduinoUnoCapabilities)
         assertNotNull(firmata.selectedBoard)
-        assertEquals(19, firmata.selectedBoard.pins.size)
+        assertEquals(19, firmata.selectedBoard!!.pins.size)
     }
 
     @Test

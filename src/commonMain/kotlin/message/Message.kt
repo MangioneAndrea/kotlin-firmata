@@ -1,6 +1,7 @@
 package message
 
 import board.Pin
+import java.nio.charset.Charset
 import kotlin.experimental.and
 import kotlin.experimental.or
 
@@ -15,6 +16,8 @@ open class Message(vararg var content: Byte) {
     val sysexContent get(): Message = partial(1 until lastIndex - 1)
 
     val firstByte get(): Byte = content.first()
+
+    val stringMessage get(): String = String(content, Charset.defaultCharset())
 
     operator fun get(index: Int): Byte = content[index]
 

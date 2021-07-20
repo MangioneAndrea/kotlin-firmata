@@ -9,7 +9,7 @@ import message.*
 class Firmata(private val connection: Connection) {
     private val listeners = HashSet<FirmataListener>();
     private val messageBuffer = MessageBuffer(::deliverMessage)
-    lateinit var selectedBoard: Board;
+    var selectedBoard: Board? = null;
 
     init {
         connection.run {
@@ -22,13 +22,15 @@ class Firmata(private val connection: Connection) {
 
     private fun updateCapability(message: Message) {
         val pinSetup = message.splitAll(0x7F)
-        selectedBoard = Board(pinSetup.size);
+        val board = Board(pinSetup.size);
         pinSetup.forEachIndexed { index, msg ->
 
-            selectedBoard.setPin(index, Pin(index, this, *msg.content.asList().chunked(2).map {
+            board.setPin(index, Pin(index, this, *msg.content.asList().chunked(2).map {
                 Pin.MODE.from(it[0])
             }.toHashSet()))
         }
+        println("board initialized")
+        selectedBoard = board
     }
 
     fun sendRequest(message: Message) {
@@ -40,14 +42,24 @@ class Firmata(private val connection: Connection) {
         return listeners.add(firmataListener)
     }
 
+    fun awaitInitialisation() {
+        while (selectedBoard == null) {
+            Thread.sleep(10)
+        }
+    }
+
 
     //https://github.com/firmata/protocol/blob/master/protocol.md#message-types
     private fun deliverMessage(message: Message) {
         println("message delivered: ${message.asHexString()}")
+
         if (message.isSysex()) {
             val sysexMessage = message.sysexContent
             if (Sysex.CAPABILITY_RESPONSE correspondsTo message[1]) {
                 updateCapability(sysexMessage startingAt 1)
+            }
+            if (Sysex.REPORT_FIRMWARE correspondsTo message[1]) {
+                println("Firmware: ${message.sysexContent.stringMessage}")
             }
         } else {
             when (message.firstNibble) {
@@ -78,10 +90,9 @@ class Firmata(private val connection: Connection) {
 
     private fun requestPin(pin: Int, mode: Pin.MODE): Pin {
         try {
-            selectedBoard[pin]!!.mode = mode
-            return selectedBoard[pin]!!
+            selectedBoard!![pin]!!.mode = mode
+            return selectedBoard!![pin]!!
         } catch (e: Exception) {
-            println(e)
             when (e) {
                 is ArrayIndexOutOfBoundsException -> throw PinNotOnBoardException(pin)
                 else -> throw e;
