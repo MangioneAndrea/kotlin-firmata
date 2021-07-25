@@ -164,3 +164,51 @@ class CapabilityQueryMessage : Message(
     Sysex.CAPABILITY_QUERY.get(),
     Midi.END_SYSEX.get()
 )
+
+/**
+ * Serial Config
+ * Configures the specified hardware or software serial port.
+ * RX and TX pins are optional and should only be specified if
+ * the platform requires them to be set.
+ */
+class SerialConfigMessage(port: Serial.Port, baud: ByteArray, rx: Byte, tx: Byte) :
+    Message(
+        Midi.START_SYSEX.get(),
+        Sysex.SERIAL_DATA.get(),
+        Serial.SERIAL_CONFIG.get() or port.get(),
+        *baud,
+        rx,
+        tx,
+        Midi.END_SYSEX.get()
+    )
+
+/**
+ * Serial Read
+ * Board -> Firmata client
+ * Read contents of serial buffer and send to Firmata client (send with SERIAL_REPLY).
+ * maxBytesToRead optionally specifies how many bytes to read for each iteration.
+ * Set to 0 (or do not define) to read all available bytes. If there are less bytes
+ * in the buffer than the number of bytes specified by maxBytesToRead then the lesser
+ * number of bytes will be returned.
+ */
+class SerialReadMessage(port: Serial.Port, mode: Serial.ReadMode) : Message(
+    Midi.START_SYSEX.get(),
+    Sysex.SERIAL_DATA.get(),
+    Serial.SERIAL_READ.get() or port.get(),
+    mode.get(),
+    Midi.END_SYSEX.get()
+)
+
+/**
+ * Serial Write
+ * Firmata client -> Board
+ *
+ * Receive serial data from Firmata client, reassemble and write for each byte received.
+ */
+class SerialWriteMessage(port: Serial.Port, vararg data: Byte) : Message(
+    Midi.START_SYSEX.get(),
+    Sysex.SERIAL_DATA.get(),
+    Serial.SERIAL_WRITE.get() or port.get(),
+    *data,
+    Midi.END_SYSEX.get()
+)

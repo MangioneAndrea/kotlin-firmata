@@ -29,9 +29,7 @@ enum class Sysex(private val byte: Byte) {
     NON_REALTIME(0x7E),
     REALTIME(0x7F);
 
-    fun toInt(): Int {
-        return byte.toInt()
-    }
+    fun toInt(): Int = byte.toInt();
 
     infix fun correspondsTo(other: Any?): Boolean {
         if (other == null) return false
@@ -39,7 +37,5 @@ enum class Sysex(private val byte: Byte) {
         return toInt() == other || get() == other
     }
 
-    fun get(): Byte {
-        return byte;
-    }
+    fun get(): Byte = byte;
 }

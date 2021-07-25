@@ -1,13 +1,20 @@
 import connection.Connection
 import gnu.io.NRSerialPort
+import message.Message
 
 
-class JvmUsbConnection : Connection {
+class JvmUsbConnection(port: String = "COM3", baud: Int = 57600) : Connection {
     var serial: NRSerialPort
 
     init {
-        NRSerialPort.getAvailableSerialPorts().forEach { println(it) }
-        serial = NRSerialPort("COM3", 57600)
+        println(
+            "Available ports: ${
+                NRSerialPort.getAvailableSerialPorts().joinToString { it }
+            }"
+        )
+        serial = NRSerialPort(
+            port, baud
+        )
     }
 
     override fun connect(): Boolean {
@@ -33,6 +40,7 @@ class JvmUsbConnection : Connection {
     }
 
     override fun write(message: ByteArray) {
+        Message(*message).print()
         serial.outputStream.write(message)
         serial.outputStream.flush()
     }

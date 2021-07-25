@@ -16,9 +16,8 @@ enum class Midi(private val byte: Byte) {
     START_SYSEX(0xF0.toByte()),
     END_SYSEX(0xF7.toByte());
 
-    fun toInt(): Int {
-        return byte.toInt()
-    }
+
+    fun toInt(): Int = byte.toInt();
 
     infix fun correspondsTo(other: Any?): Boolean {
         if (other == null) return false
@@ -26,7 +25,5 @@ enum class Midi(private val byte: Byte) {
         return toInt() == other || get() == other
     }
 
-    fun get(): Byte {
-        return byte;
-    }
+    fun get(): Byte = byte;
 }

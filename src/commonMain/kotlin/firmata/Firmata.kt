@@ -2,6 +2,7 @@ package firmata
 
 import board.Pin
 import board.boards.Board
+import board.interfaces.SerialCommunicator
 import connection.Connection
 import exceptions.PinNotOnBoardException
 import message.*
@@ -49,6 +50,7 @@ class Firmata(private val connection: Connection) {
     }
 
 
+
     //https://github.com/firmata/protocol/blob/master/protocol.md#message-types
     private fun deliverMessage(message: Message) {
         println("message delivered: ${message.asHexString()}")
@@ -60,6 +62,21 @@ class Firmata(private val connection: Connection) {
             }
             if (Sysex.REPORT_FIRMWARE correspondsTo message[1]) {
                 println("Firmware: ${message.sysexContent.stringMessage}")
+            }
+            if (Sysex.SERIAL_DATA correspondsTo message[1]) {
+                val command = Message(message[2])
+                if (Serial.SERIAL_REPLY correspondsTo (command.firstNibble)) {
+                    listeners.forEach {
+                        if (it is SerialCommunicator) {
+                            if (it.port correspondsTo command.secondNibble) {
+                                it.onMessageReceived(message)
+                            }
+                        }
+                        if (it.pins.any { pin -> pin.position.toByte() == message.secondNibble }) it.onMessageReceived(
+                            message
+                        )
+                    }
+                }
             }
         } else {
             when (message.firstNibble) {
@@ -130,6 +147,28 @@ class Firmata(private val connection: Connection) {
 
         fun Firmata.Button(pin: Int): board.Button {
             val element = board.Button(requestPin(pin, Pin.MODE.INPUT))
+            registerListener(element)
+            return element
+        }
+
+        fun Firmata.HC12(rx: Int, tx: Int, baud: Int = 9600): board.HC12 {
+            val element = board.HC12(
+                Serial.Port.HW_SERIAL0,
+                requestPin(rx, Pin.MODE.INPUT_PULLUP),
+                requestPin(tx, Pin.MODE.OUTPUT)
+            )
+            this.sendRequest(
+                SerialConfigMessage(
+                    Serial.Port.HW_SERIAL0,
+                    byteArrayOf(
+                        (baud and 0xFF0000).toByte(),
+                        (baud and 0x00FF00).toByte(),
+                        (baud and 0x0000FF).toByte()
+                    ),
+                    element.pins[0].position.toByte(),
+                    element.pins[1].position.toByte()
+                )
+            )
             registerListener(element)
             return element
         }

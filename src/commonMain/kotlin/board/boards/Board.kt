@@ -12,4 +12,9 @@ class Board(size: Int) {
     operator fun get(index: Int): Pin? {
         return pins[index]
     }
+
+    val capabilities: Map<Int, HashSet<Pin.MODE>>
+        get() = pins.associate { pin ->
+            Pair(pin!!.position, pin.modes)
+        }
 }

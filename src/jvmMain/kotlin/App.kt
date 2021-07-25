@@ -1,33 +1,54 @@
 import firmata.Firmata
-import firmata.Firmata.Companion.Led
+import firmata.Firmata.Companion.HC12
+import firmata.Firmata.Companion.PWMLed
 import message.CapabilityQueryMessage
+import message.Message
 
 
 class App {
 
     companion object {
 
-        fun blink(firmata: Firmata) {
-            val led = firmata.Led(7);
-            while (true) {
-                Thread.sleep(1000)
+        fun loop(firmata: Firmata) {
+            println(firmata.selectedBoard!!.capabilities)
+            val hc12 = firmata.HC12(11, 10, 9600)
+            val led = firmata.PWMLed(5);
 
-                led.turnOn();
-                println("Turned on!")
-                Thread.sleep(1000)
-                led.turnOff()
+            while (true) {
+                // Write hello
+                Thread.sleep(10);
+                hc12.writeMessage(Message(0x48, 0x65, 0x6c, 0x6c, 0x6f))
+                //led.setBrightness(Math.random().toFloat())
             }
+        }
+
+        fun setup(firmata: Firmata) {
         }
 
 
         @JvmStatic
         fun main(args: Array<String>) {
             val connection = JvmUsbConnection()
-            val firmata = Firmata(connection)
+            val uno = Firmata(connection)
             Thread.sleep(2000)
-            firmata.sendRequest(CapabilityQueryMessage());
-            firmata.awaitInitialisation()
-            blink(firmata)
+            uno.sendRequest(CapabilityQueryMessage());
+            uno.awaitInitialisation()
+            setup(uno);
+            loop(uno)
+
+
+        }
+
+        fun directHC12() {
+            val connection = JvmUsbConnection("COM4", 9600)
+            val hc12 = Firmata(connection)
+
+            while (true) {
+                // Write hello
+                Thread.sleep(10);
+                hc12.sendRequest(Message(0x48, 0x65, 0x6c, 0x6c, 0x6f))
+                //led.setBrightness(Math.random().toFloat())
+            }
         }
     }
 }

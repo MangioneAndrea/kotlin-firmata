@@ -1,25 +1,28 @@
 package board
 
-import board.interfaces.Actor
 import board.interfaces.Element
-import board.interfaces.Sensor
+import board.interfaces.SerialCommunicator
 import message.Message
+import message.Serial
+import message.SerialReadMessage
+import message.SerialWriteMessage
 
-class HC12 : Element, Sensor, Actor {
+class HC12(
+    override val port: Serial.Port, private val rx: Pin, private val tx: Pin
+) : Element,
+    SerialCommunicator {
     override val pins: ArrayList<Pin>
-        get() = TODO("Not yet implemented")
+        get() = arrayListOf(rx, tx)
 
-    override fun setValue(vararg status: Pin.Status) {
-        TODO("Not yet implemented")
+    override fun writeMessage(message: Message) {
+        rx.firmata.sendRequest(SerialWriteMessage(port, *message.content))
     }
 
-    override fun getValue(): Pin.Status {
-        TODO("Not yet implemented")
+    override fun readMessage(mode: Serial.ReadMode) {
+        SerialReadMessage(port, mode)
     }
 
     override fun onMessageReceived(message: Message) {
-        TODO("Not yet implemented")
+        message.sysexContent startingAt 2
     }
-
-
 }
