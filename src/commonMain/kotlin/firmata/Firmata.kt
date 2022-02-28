@@ -50,7 +50,6 @@ class Firmata(private val connection: Connection) {
     }
 
 
-
     //https://github.com/firmata/protocol/blob/master/protocol.md#message-types
     private fun deliverMessage(message: Message) {
         println("message delivered: ${message.asHexString()}")
@@ -155,19 +154,8 @@ class Firmata(private val connection: Connection) {
             val element = board.HC12(
                 Serial.Port.HW_SERIAL0,
                 requestPin(rx, Pin.MODE.INPUT_PULLUP),
-                requestPin(tx, Pin.MODE.OUTPUT)
-            )
-            this.sendRequest(
-                SerialConfigMessage(
-                    Serial.Port.HW_SERIAL0,
-                    byteArrayOf(
-                        (baud and 0xFF0000).toByte(),
-                        (baud and 0x00FF00).toByte(),
-                        (baud and 0x0000FF).toByte()
-                    ),
-                    element.pins[0].position.toByte(),
-                    element.pins[1].position.toByte()
-                )
+                requestPin(tx, Pin.MODE.OUTPUT),
+                baud
             )
             registerListener(element)
             return element
